@@ -34,7 +34,7 @@ namespace Rounds_Rogelike.GameModes
             {
                 UnityEngine.Debug.Log("Died on Floor" + floorHandler.floor);
                 UnityEngine.Debug.Log("Clossing game");
-               Application.Quit();
+                Application.Quit();
                 //Game Over
             }
             ItemShops.Extensions.PlayerExtension.GetAdditionalData(PlayerManager.instance.players.Find(p => p.playerID == 0))
@@ -54,14 +54,14 @@ namespace Rounds_Rogelike.GameModes
 
         private IEnumerator NextRound()
         {
-            yield return floorHandler.getNextFloor(this);
-            yield return new WaitForSecondsRealtime(0.25f);
-            UnityEngine.Debug.Log(ItemShops.Extensions.PlayerExtension.GetAdditionalData(PlayerManager.instance.players.Find(p => p.playerID == 0))
-                .bankAccount.Money[Main.Gold]);
             GameManager.instance.battleOngoing = false;
             TimeHandler.instance.DoSlowDown();
             PlayerManager.instance.SetPlayersSimulated(false);
             PlayerManager.instance.InvokeMethod("SetPlayersVisible", false);
+            yield return floorHandler.getNextFloor(this);
+            yield return new WaitForSecondsRealtime(0.25f);
+            UnityEngine.Debug.Log(ItemShops.Extensions.PlayerExtension.GetAdditionalData(PlayerManager.instance.players.Find(p => p.playerID == 0))
+                .bankAccount.Money[Main.Gold]);
             UnityEngine.Debug.Log(floor);
             if (floor.isShop) {
                 floor.Shop.Show(PlayerManager.instance.players.Find(p => p.playerID == 0));
@@ -78,10 +78,6 @@ namespace Rounds_Rogelike.GameModes
             }
             else
             {
-                GameManager.instance.battleOngoing = false;
-                TimeHandler.instance.DoSlowDown();
-                PlayerManager.instance.SetPlayersSimulated(false);
-                PlayerManager.instance.InvokeMethod("SetPlayersVisible", false);
                 MapManager.instance.LoadNextLevel(false, false);
 
                 yield return new WaitForSecondsRealtime(2f);
@@ -168,6 +164,7 @@ namespace Rounds_Rogelike.GameModes
                base.StartCoroutine(CreatePlayer(Grub.cardInfo));
             floorHandler = new FloorHandler();
 
+            this.UI = Rounds_Rogelike.UI.UIHandaler.Create_UI(this);
         }
         public virtual IEnumerator DoRoundStart()
         {
@@ -230,7 +227,7 @@ namespace Rounds_Rogelike.GameModes
             ModdingUtils.Utils.Cards.instance.AddCardsToPlayer(component.player, cards, false, addToCardBar:false);
             yield break;
         }
-
+        private GameObject UI;
         public FloorHandler floorHandler;
         public Floor floor;
     }

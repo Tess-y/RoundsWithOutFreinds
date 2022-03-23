@@ -39,6 +39,9 @@ namespace Rounds_Rogelike
             nonPathCard = CustomCardCategories.instance.CardCategory("__NotPath__");
             GameModeManager.AddHandler<GameModes.GM_RWOF>("Adventure", new GameModes.RWOFHandler());
 
+            Unbound.Instance.ExecuteAfterSeconds(0.4f, BuildDefaultCategory);
+
+
 
             CustomCard.BuildCard<Grub>(Grub.callback);
 
@@ -50,7 +53,7 @@ namespace Rounds_Rogelike
 
         private static void BuildDefaultCategory()
         {
-            List<UnboundLib.Utils.Card> allCards = UnboundLib.Utils.CardManager.cards.Values.Where(c => !c.category.ToUpper().StartsWith("RWOF_")).ToList();
+            List<UnboundLib.Utils.Card> allCards = UnboundLib.Utils.CardManager.cards.Values.ToList();
             foreach (var currentCard in allCards)
             {
                 var currentCardsCategories = currentCard.cardInfo.categories.ToList();
