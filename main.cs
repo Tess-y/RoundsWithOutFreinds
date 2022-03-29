@@ -13,6 +13,7 @@ namespace Rounds_Rogelike
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("pykess.rounds.plugins.moddingutils", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.willuwontu.rounds.itemshops", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("pykess.rounds.plugins.pickncards", BepInDependency.DependencyFlags.HardDependency)]
     [BepInPlugin(ModId, ModName, Version)]
     [BepInProcess("Rounds.exe")]
     public class Main : BaseUnityPlugin
@@ -44,10 +45,13 @@ namespace Rounds_Rogelike
 
 
             CustomCard.BuildCard<Grub>(Grub.callback);
+            CustomCard.BuildCard<Spewer>(Spewer.callback);
 
 
             CustomCard.BuildCard<Shop_Path>(Shop_Path.callback);
             CustomCard.BuildCard<Fight_Path>(Fight_Path.callback);
+
+            this.ExecuteAfterSeconds(1f, Util.Units.init);
         }
 
 

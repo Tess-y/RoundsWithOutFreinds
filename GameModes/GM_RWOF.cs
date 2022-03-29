@@ -161,7 +161,7 @@ namespace Rounds_Rogelike.GameModes
 
             PlayerManager.instance.SetPlayersSimulated(true);
             if(PlayerManager.instance.players.Count< 2)
-               base.StartCoroutine(CreatePlayer(Grub.cardInfo));
+               base.StartCoroutine(CreatePlayer(Util.Units.Grub));
             floorHandler = new FloorHandler();
 
             this.UI = Rounds_Rogelike.UI.UIHandaler.Create_UI(this);
@@ -210,10 +210,15 @@ namespace Rounds_Rogelike.GameModes
             List<SpawnPoint> spawnPoints = MapManager.instance.currentMap.Map.GetComponentsInChildren<SpawnPoint>().Where(s => s.localStartPos.x > 0).ToList();
             spawnPoints.Shuffle();
             Vector3 vector;
-            if(spawnPoints.Count > 0)
+            if (spawnPoints.Count > 0)
+            {
                 vector = spawnPoints.First().localStartPos;
+            }
             else
+            {
                 vector = Vector3.zero;
+            }
+
             CharacterData component = PhotonNetwork.Instantiate(PlayerAssigner.instance.playerPrefab.name, vector, Quaternion.identity, (byte)0, (object[])null).GetComponent<CharacterData>();
             
             GameObject original = PlayerAssigner.instance.player2AI;
@@ -224,7 +229,16 @@ namespace Rounds_Rogelike.GameModes
 
             PlayerAssigner.instance.players.Add(component);
             PlayerAssigner.instance.InvokeMethod("RegisterPlayer",component, teamIDToSet, playerIDToSet);
-            ModdingUtils.Utils.Cards.instance.AddCardsToPlayer(component.player, cards, false, addToCardBar:false);
+            foreach (CardInfo card in cards)
+            {
+                try
+                {
+                    ModdingUtils.Utils.Cards.instance.AddCardToPlayer(component.player, card, false, addToCardBar: false);
+                }
+                catch { }
+                yield return new WaitForSecondsRealtime(0.1f);
+            }
+            UnityEngine.Debug.Log(component.player.data.currentCards.Count);
             yield break;
         }
         private GameObject UI;

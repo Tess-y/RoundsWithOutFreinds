@@ -64,7 +64,12 @@ namespace Rounds_Rogelike.Floors
                 case Path.Fight:
                     List<CardInfo[]> AI_to_spawn = new List<CardInfo[]>();
                     for (int i = rand.Next(8); i < 8; i++)
-                        AI_to_spawn.Add(new CardInfo[] { Grub.cardInfo });
+                    {
+                        if (i == 7 && floor > 5)
+                            AI_to_spawn.Add(Util.Units.Spewer);
+                        else
+                            AI_to_spawn.Add(Util.Units.Grub);
+                    }
                     gm.floor = new Floor(false, AI_to_spawn, null);
                     break;
             }

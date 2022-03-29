@@ -30,7 +30,10 @@ namespace Rounds_Rogelike.Extentions
     public enum Path
     {
         Shop,
-        Fight
+        Fight,
+        Event,
+        Mini_Boss,
+        Boss
     }
     public static class CharacterStatModifiersExtension
     {
