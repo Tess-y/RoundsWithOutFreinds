@@ -6,6 +6,7 @@ using System.Text;
 using HarmonyLib;
 using ItemShops.Utils;
 using Rounds_Rogelike.Cards;
+using Rounds_Rogelike.Events;
 using Rounds_Rogelike.Extentions;
 using Rounds_Rogelike.GameModes;
 using UnboundLib;
@@ -59,7 +60,7 @@ namespace Rounds_Rogelike.Floors
                         }
                         shop.AddItem(allCards[i].cardInfo.name, new PurchasableCard(allCards[i].cardInfo, cost, new Tag[] { }), new PurchaseLimit(1, 1));
                     }
-                    gm.floor = new Floor(true, null, shop);
+                    gm.floor = new Floor(shop);
                     break;
                 case Path.Fight:
                     List<CardInfo[]> AI_to_spawn = new List<CardInfo[]>();
@@ -70,7 +71,12 @@ namespace Rounds_Rogelike.Floors
                         else
                             AI_to_spawn.Add(Util.Units.Grub);
                     }
-                    gm.floor = new Floor(false, AI_to_spawn, null);
+                    gm.floor = new Floor(AI_to_spawn);
+                    break;
+                case Path.Event:
+                    List<Event> events = Event.Events.Where(e => e.IsValid(player,floor)).ToList();
+                    events.Shuffle();
+                    gm.floor = new Floor(events.First());
                     break;
             }
             yield return new WaitForSecondsRealtime(0.1f);
@@ -92,15 +98,35 @@ namespace Rounds_Rogelike.Floors
 
     public class Floor
     {
-        public bool isShop;
+        public Path Path;
         public List<CardInfo[]>? AI_to_spawn;
         public Shop? Shop;
+        public Event? Event;
 
-        public Floor(bool isShop, List<CardInfo[]>? aI_to_spawn, Shop? shop)
+        public Floor(List<CardInfo[]> aI_to_spawn)
         {
-            this.isShop = isShop;
+            Path = Path.Fight;
+            AI_to_spawn = aI_to_spawn;
+        }
+
+        public Floor(Shop shop)
+        {
+            Path = Path.Shop;
+            Shop = shop;
+        }
+
+        public Floor(Event @event)
+        {
+            Path = Path.Event;
+            Event = @event;
+        }
+
+        public Floor(Path path, List<CardInfo[]>? aI_to_spawn, Shop? shop, Event? @event)
+        { 
+            Path = path;
             AI_to_spawn = aI_to_spawn;
             Shop = shop;
+            Event = @event;
         }
     }
 

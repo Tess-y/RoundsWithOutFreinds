@@ -52,7 +52,7 @@ namespace Rounds_Rogelike.GameModes
             }
         }
 
-        private IEnumerator NextRound()
+        public IEnumerator NextRound()
         {
             GameManager.instance.battleOngoing = false;
             TimeHandler.instance.DoSlowDown();
@@ -63,38 +63,43 @@ namespace Rounds_Rogelike.GameModes
             UnityEngine.Debug.Log(ItemShops.Extensions.PlayerExtension.GetAdditionalData(PlayerManager.instance.players.Find(p => p.playerID == 0))
                 .bankAccount.Money[Main.Gold]);
             UnityEngine.Debug.Log(floor);
-            if (floor.isShop) {
-                floor.Shop.Show(PlayerManager.instance.players.Find(p => p.playerID == 0));
-                yield return new WaitForSecondsRealtime(0.25f);
-                floor.Shop.Hide(); 
-                yield return new WaitForSecondsRealtime(0.25f);
-                floor.Shop.Show(PlayerManager.instance.players.Find(p => p.playerID == 0));
-                yield return new WaitForSecondsRealtime(2f);
-                yield return new WaitUntil(() => !ShopManager.instance.PlayerIsInShop(PlayerManager.instance.players.Find(p => p.playerID == 0)));
-                floorHandler.floor++;
-                TimeHandler.instance.DoSlowDown();
-                yield return new WaitForSecondsRealtime(2f);
-                base.StartCoroutine(this.NextRound());
-            }
-            else
-            {
-                MapManager.instance.LoadNextLevel(false, false);
+            switch(floor.Path) {
+                case Path.Shop:
+                    floor.Shop.Show(PlayerManager.instance.players.Find(p => p.playerID == 0));
+                    yield return new WaitForSecondsRealtime(0.25f);
+                    floor.Shop.Hide();
+                    yield return new WaitForSecondsRealtime(0.25f);
+                    floor.Shop.Show(PlayerManager.instance.players.Find(p => p.playerID == 0));
+                    yield return new WaitForSecondsRealtime(2f);
+                    yield return new WaitUntil(() => !ShopManager.instance.PlayerIsInShop(PlayerManager.instance.players.Find(p => p.playerID == 0)));
+                    floorHandler.floor++;
+                    TimeHandler.instance.DoSlowDown();
+                    yield return new WaitForSecondsRealtime(2f);
+                    base.StartCoroutine(this.NextRound());
+                    break;
 
-                yield return new WaitForSecondsRealtime(2f);
+                case Path.Fight:
+                    MapManager.instance.LoadNextLevel(false, false);
 
-                MapManager.instance.CallInNewMapAndMovePlayers(MapManager.instance.currentLevelID);
+                    yield return new WaitForSecondsRealtime(2f);
 
-                yield return new WaitForSecondsRealtime(1f);
-                TimeHandler.instance.DoSpeedUp();
-                TimeHandler.instance.StartGame();
-                GameManager.instance.battleOngoing = true;
-                PlayerManager.instance.InvokeMethod("SetPlayersVisible", true);
-                PlayerManager.instance.SetPlayersSimulated(true);
-
-                yield return new WaitForSecondsRealtime(2f);
-                foreach (CardInfo[] cards in floor.AI_to_spawn)
-                    base.StartCoroutine(CreatePlayer(cards));
-            }
+                    MapManager.instance.CallInNewMapAndMovePlayers(MapManager.instance.currentLevelID);
+    
+                    yield return new WaitForSecondsRealtime(1f);
+                    TimeHandler.instance.DoSpeedUp();
+                    TimeHandler.instance.StartGame();
+                    GameManager.instance.battleOngoing = true;
+                    PlayerManager.instance.InvokeMethod("SetPlayersVisible", true);
+                    PlayerManager.instance.SetPlayersSimulated(true);
+    
+                    yield return new WaitForSecondsRealtime(2f);
+                    foreach (CardInfo[] cards in floor.AI_to_spawn)
+                        base.StartCoroutine(CreatePlayer(cards));
+                    break;
+                case Path.Event:
+                    yield return floor.Event.DoEvent(PlayerManager.instance.players.Find(p => p.playerID == 0), this);
+                    break;
+            }  
         }
 
         public void StartGame()
