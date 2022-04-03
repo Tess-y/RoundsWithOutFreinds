@@ -13,9 +13,8 @@ using UnityEngine;
 
 namespace Rounds_Rogelike.Cards
 {
-    class Fight_Path : CustomCard
+    class Fight_Path : PathCardBase
     {
-        public static CardInfo cardInfo;
         public static CardCategory category = CustomCardCategories.instance.CardCategory("FightPath");
         public override void SetupCard(CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block)
         {
@@ -45,24 +44,10 @@ namespace Rounds_Rogelike.Cards
         {
             return CardInfo.Rarity.Common;
         }
-        protected override CardInfoStat[] GetStats()
-        {
-            return new CardInfoStat[]
-            {
-            };
-        }
         protected override CardThemeColor.CardThemeColorType GetTheme()
         {
             return CardThemeColor.CardThemeColorType.ColdBlue;
         }
-        public override string GetModName()
-        {
-            return "RWOF_PATH";
-        }
 
-        public static void callback(CardInfo card)
-        {
-            cardInfo = card;
-        }
     }
 }
